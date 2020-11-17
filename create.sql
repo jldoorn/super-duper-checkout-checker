@@ -7,11 +7,13 @@ CREATE TABLE ra(
 CREATE TABLE bed(
     id INTEGER PRIMARY KEY,
     room_num INTEGER,
+    room_wing TEXT,
     bed_name TEXT,
-    ra1_id INTEGER,
-    ra2_id INTEGER,
-    bed_checked_out INTEGER,
-    bed_time_checked_out INTEGER,
+    ra1_id INTEGER DEFAULT  0,
+    ra2_id INTEGER DEFAULT  0,
+    bed_checked_out INTEGER DEFAULT 0,
+    bed_time_checked_out INTEGER DEFAULT -1,
+    comments TEXT DEFAULT '',
     FOREIGN KEY(ra1_id) REFERENCES ra(id),
     FOREIGN KEY(ra2_id) REFERENCES ra(id)
 );
