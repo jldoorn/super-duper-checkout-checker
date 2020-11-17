@@ -18,3 +18,5 @@
 /.idea/super-duper-checkout-checker.iml
 /.idea/vcs.xml
 /.idea/workspace.xml
+.idea/
+/web/node_modules

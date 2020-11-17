@@ -1,21 +1,16 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-	"github.com/jldoorn/super-duper-checkout-checker/room"
+	"github.com/jldoorn/super-duper-checkout-checker/controllers"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
+	"net/http"
 )
 
 func main() {
 	println("hello world")
-	db, err := sql.Open("sqlite3", "./beds.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	myBed := room.GetRoom(2, db)
-	fmt.Println(myBed)
+
+	controllers.RegisterControllers()
+	http.ListenAndServe(":3080", nil)
 	//myBed.IsOut = true
 	//myBed.Ra1 = 1
 	//myBed.Comments = "Room looks good!"

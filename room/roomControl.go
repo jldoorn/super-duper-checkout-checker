@@ -2,7 +2,6 @@ package room
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 )
@@ -20,7 +19,12 @@ type Bed struct {
 }
 
 type Room struct {
+	RoomNum int
 	Beds []Bed
+}
+
+type Rooms struct{
+	Rooms []int
 }
 
 func GetRoom(num int, db *sql.DB) Room {
@@ -46,7 +50,7 @@ func GetRoom(num int, db *sql.DB) Room {
 		}
 		beds = append(beds, Bed{Id: id, Room: room_num, Name: name, Ra1: ra1, Ra2: ra2, IsOut: isout, TimeOut: timeout, Wing: wing, Comments: comments})
 	}
-	return Room{Beds: beds}
+	return Room{RoomNum: num, Beds: beds}
 }
 
 func UpdateBed(bed Bed, db *sql.DB) {
@@ -61,7 +65,6 @@ func UpdateBed(bed Bed, db *sql.DB) {
 	//SET bed_checked_out = $1, ra1_id = $2, ra2_id = $3, bed_time_checked_out = $4, comments = $5
 	//WHERE id = $5;
 	//`, bed.IsOut, bed.Ra1, bed.Ra2, curTime, bed.Comments)
-	fmt.Println(bed)
 	tx, err := db.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -73,4 +76,42 @@ func UpdateBed(bed Bed, db *sql.DB) {
 	defer stmt.Close()
 	stmt.Exec(bed.IsOut, bed.Ra1, bed.Ra2, curTime, bed.Comments, bed.Id)
 	tx.Commit()
+}
+
+func GetAll(db *sql.DB) Rooms{
+	rows, err := db.Query("SELECT DISTINCT room_num FROM bed")
+	rooms := []int{}
+	if err != nil{
+		return Rooms{}
+	}
+	defer rows.Close()
+	for rows.Next(){
+		var room int
+		err = rows.Scan(&room)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rooms = append(rooms, room)
+	}
+
+	return Rooms{Rooms: rooms}
+}
+
+func GetFloor(floor string, db *sql.DB) Rooms{
+	rooms := []int{}
+	rows, err := db.Query("SELECT DISTINCT room_num FROM bed WHERE room_wing = $1", floor)
+	if err != nil {
+		println("err in db query")
+	}
+	defer rows.Close()
+	for rows.Next(){
+		var room int
+		err = rows.Scan(&room)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rooms = append(rooms, room)
+	}
+
+	return Rooms{Rooms:rooms}
 }
